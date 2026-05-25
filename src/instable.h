@@ -245,6 +245,18 @@ case 0x22:			/*  JSL Long */
 	tmp1 = arg;
 	CYCLES_PLUS_3;
 	INC_KPC_3;
+	if(tmp1 == 0xd0fded) {	/* virtual firmware COUT: print A to host */
+		INC_KPC_1;	/* JSL is 4 bytes; INC_KPC_3 above lands on the
+				   last operand byte (standard JSL push value).
+				   We're falling through, so bump one more. */
+		kegs_virtual_cout(acc & 0xff);
+		break;
+	}
+	if(tmp1 == 0xd0fdda) {	/* virtual firmware PRBYTE: print A as hex */
+		INC_KPC_1;
+		kegs_virtual_prbyte(acc & 0xff);
+		break;
+	}
 	PUSH24_UNSAFE(kpc);
 	kpc = tmp1 & 0xffffff;
 	break;

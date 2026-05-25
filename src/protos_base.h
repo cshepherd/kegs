@@ -522,6 +522,8 @@ void set_memory_io(word32 loc, int val, dword64 *dcyc_ptr);
 void show_regs_act(Engine_reg *eptr);
 void show_regs(void);
 void my_exit(int ret);
+void kegs_virtual_cout(int ch);
+void kegs_virtual_prbyte(int val);
 void do_reset(void);
 byte *memalloc_align(int size, int skip_amt, void **alloc_ptr);
 void memory_ptr_init(void);

@@ -384,6 +384,28 @@ my_exit(int ret)
 	printf("exiting\n");
 }
 
+/* Virtual firmware call: JSL $D0FDED prints A as an ASCII char on the host.
+   Apple II convention is high-bit-set ASCII with CR (0x0D) line endings. */
+void
+kegs_virtual_cout(int ch)
+{
+	ch &= 0x7f;
+	if(ch == 0x0d) {
+		ch = '\n';
+	}
+	fputc(ch, stdout);
+	fflush(stdout);
+}
+
+/* Virtual firmware call: JSL $D0FDDA prints A as two hex digits on the host.
+   Mirrors the Apple II PRBYTE entry point at $FDDA. */
+void
+kegs_virtual_prbyte(int val)
+{
+	fprintf(stdout, "%02X", val & 0xff);
+	fflush(stdout);
+}
+
 
 void
 do_reset()
