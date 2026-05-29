@@ -203,6 +203,9 @@ class MainView: NSView {
 						Int32(x_width))
 		y = video_scale_mouse_y(kimage_ptr, Int32(raw_y),
 						Int32(y_height))
+		if((buttons_state & buttons_valid & 1) != 0) {
+			click_debug_report(x, y)
+		}
 		do_delta = 0;
 		if(mac_warp_pointer != 0) {
 			do_delta |= 0x1000;	// x,y are deltas

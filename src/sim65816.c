@@ -76,6 +76,7 @@ int	g_halt_sim = 0;
 int	g_rom_version = -1;
 int	g_user_halt_bad = 0;
 int	g_halt_on_bad_read = 0;
+int	g_click_debug = 0;
 int	g_ignore_bad_acc = 1;
 int	g_ignore_halts = 1;
 int	g_code_red = 0;
@@ -641,6 +642,9 @@ parse_argv(int argc, char **argv, int slashes_to_find)
 			printf("Forcing black-and-white hires modes\n");
 			g_cur_a2_stat |= ALL_STAT_COLOR_C021;
 			g_use_bw_hires = 1;
+		} else if(!strcmp("--click-debug", argv[i])) {
+			printf("Logging mouse clicks on SHR screen to stdout\n");
+			g_click_debug = 1;
 		} else if(!strncmp("-NS", argv[i], 3)) {
 			// Some Mac argument, just ignore it
 			if((i + 1) < argc) {

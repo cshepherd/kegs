@@ -2668,6 +2668,31 @@ video_update_scale(Kimage *kimage_ptr, int out_width, int out_height,
 	}
 }
 
+extern int g_click_debug;
+
+void
+click_debug_report(int a2_x, int a2_y)
+{
+	int	shr_x, shr_y, offset;
+
+	if(!g_click_debug) {
+		return;
+	}
+	if(!(g_cur_a2_stat & ALL_STAT_SUPER_HIRES)) {
+		return;
+	}
+	// a2 coords are in the 640x400 active area.  SHR is 320x200.
+	shr_x = a2_x / 2;
+	shr_y = a2_y / 2;
+	if((shr_x < 0) || (shr_x >= 320) || (shr_y < 0) || (shr_y >= 200)) {
+		return;		// Click was in border, not on SHR pixels
+	}
+	// SHR 320 mode packs 2 pixels per byte: 200 lines * 160 bytes/line
+	offset = (shr_y * 160) + (shr_x / 2);
+	printf("click x=%d y=%d  E1/%04X\n", shr_x, shr_y, 0x2000 + offset);
+	fflush(stdout);
+}
+
 int
 video_scale_mouse_x(Kimage *kimage_ptr, int raw_x, int x_width)
 {

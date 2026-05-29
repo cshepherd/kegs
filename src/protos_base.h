@@ -877,6 +877,7 @@ word32 video_scale_calc_frac(int pos, word32 max, word32 frac_inc, word32 frac_i
 void video_update_scale(Kimage *kimage_ptr, int out_width, int out_height, int must_update);
 int video_scale_mouse_x(Kimage *kimage_ptr, int raw_x, int x_width);
 int video_scale_mouse_y(Kimage *kimage_ptr, int raw_y, int y_height);
+void click_debug_report(int a2_x, int a2_y);
 int video_unscale_mouse_x(Kimage *kimage_ptr, int a2_x, int x_width);
 int video_unscale_mouse_y(Kimage *kimage_ptr, int a2_y, int y_height);
 void video_update_color_raw(int bank, int col_num, int a2_color);
