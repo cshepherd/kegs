@@ -19,6 +19,7 @@ const char rcsid_debugger_c[] = "@(#)$KmKId: debugger.c,v 1.60 2023-09-11 12:55:
 
 #include "disas.h"
 #include "debug_sock.h"
+#include "testfix.h"
 
 #define LINE_SIZE		160		/* Input buffer size */
 #define PRINTF_BUF_SIZE		239
@@ -445,6 +446,18 @@ Dbg_longcmd g_debug_iwm[] = {
 	{ 0, 0, 0, 0 }
 };
 
+Dbg_longcmd g_debug_testfix[] = {
+	{ "record",	debug_testfix_record, 0,
+				"testfix record FILE: record input runbook" },
+	{ "play",	debug_testfix_play, 0,
+			"testfix play FILE: play runbook, halt at end" },
+	{ "stop",	debug_testfix_stop, 0,
+				"Stop recording or playback" },
+	{ "status",	debug_testfix_status, 0,
+				"Show record/playback state" },
+	{ 0, 0, 0, 0 }
+};
+
 // Main table of commands
 Dbg_longcmd g_debug_longcmds[] = {
 	{ "help",	debug_help,	0,	"Help" },
@@ -453,6 +466,8 @@ Dbg_longcmd g_debug_longcmds[] = {
 	{ "logpc",	debug_logpc,	&g_debug_logpc[0], "Log PC" },
 	{ "iwm",	debug_iwm,	&g_debug_iwm[0], "IWM" },
 	{ "soundfile",	debug_soundfile, 0, "Save sound to a WAV file" },
+	{ "testfix",	debug_testfix_status, &g_debug_testfix[0],
+					"Input record/playback runbooks" },
 	{ 0, 0, 0, 0 }
 };
 

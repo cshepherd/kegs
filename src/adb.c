@@ -16,6 +16,8 @@ const char rcsid_adb_c[] = "@(#)$KmKId: adb.c,v 1.115 2024-01-15 02:54:46+00 ken
 
 #include "defc.h"
 
+#include "testfix.h"
+
 extern int Verbose;
 extern word32 g_vbl_count;
 extern int g_num_lines_prev_superhires640;
@@ -1310,6 +1312,8 @@ adb_update_mouse(Kimage *kimage_ptr, int x, int y, int button_states,
 
 	if(kimage_ptr != &g_mainwin_kimage) {
 		adb_nonmain_check();
+	} else {
+		testfix_mouse_hook(x, y, button_states, buttons_valid);
 	}
 	dfcyc = g_cur_dfcyc;
 
@@ -2047,6 +2051,18 @@ adb_physical_key_update(Kimage *kimage_ptr, int raw_a2code, word32 unicode_c,
 			break;
 		default:
 			break;
+		}
+	}
+
+	/* Test-fixture record/playback tap: record main-window keys, or */
+	/*  consume F10 which stops recording/playback */
+	if(kimage_ptr == &g_mainwin_kimage) {
+		if(testfix_key_hook(raw_a2code, unicode_c, is_up, special)) {
+			if(restore_c025_val) {
+				g_c025_val = restore_c025_val & 0xff;
+				kimage_ptr->c025_val = restorek_c025_val;
+			}
+			return;
 		}
 	}
 

@@ -176,6 +176,65 @@ for _ in range(20):
 print(k.read_mem(0x02, 0x2000, 0x21ff))
 ```
 
+## Test fixtures (input runbooks)
+
+KEGS can record a session's keyboard and mouse input with emulated-cycle
+timestamps and play it back deterministically — a Playwright-style test
+fixture. At the end of a playback script the emulator **halts into the
+debugger**, so a client on the debug socket can inspect the resulting
+machine state.
+
+### Command line
+
+```bash
+./KEGSMAC.app/Contents/MacOS/KEGSMAC -record steps.kfix          # record from power-on
+./KEGSMAC.app/Contents/MacOS/KEGSMAC -playback steps.kfix -dbgport 6510
+```
+
+While recording, **F10 stops the recording** (F10 rather than ESC, so ESC
+keypresses can themselves be recorded). Stopping writes a final `W` wait
+record stamped at the moment F10 was hit, so playback runs on to that same
+moment — leave a settle pause before pressing F10 and the fixture will
+include it. During playback F10 aborts the script without halting.
+
+For reproducible fixtures, record from power-on with the same disk images
+and config; playback re-injects events at the same emulated cycle counts
+(to within one 60 Hz frame).
+
+### Debugger / socket commands
+
+| Command | Effect |
+|---|---|
+| `testfix record FILE` | Arm recording (starts when emulation next runs) |
+| `testfix play FILE` | Arm playback; halts into the debugger at script end |
+| `testfix stop` | Stop recording (writes the file) or abort playback |
+| `testfix` / `testfix status` | Show mode, event count, current cycle |
+
+A typical agent loop over the socket: `testfix play fixture.kfix`, then
+`g` if halted, then wait for the async `testfix: playback complete,
+halting` message, then inspect registers/memory as usual. Emulated time
+freezes while halted, so a breakpoint that fires mid-script simply pauses
+the remaining playback until you `g` again.
+
+### Runbook file format
+
+Plain text, one event per line, `#` comments allowed, editable by hand:
+
+```
+KEGSFIX1
+K <cycle> <raw_a2code hex> <unicode hex> <is_up>     # key transition
+M <cycle> <x> <y> <button_states> <buttons_valid>    # mouse move/buttons
+W <cycle>                                            # wait until cycle
+```
+
+`<cycle>` is a decimal count of emulated cycles (`g_cur_dfcyc >> 16`,
+roughly 1.02 MHz) since the recording started. Key events use the raw
+Apple ADB keycode plus the unicode character the host driver supplied
+(e.g. `K 3000000 00 0061 0` presses `a`, `K 3060000 00 0061 1` releases
+it). Mouse `x`/`y` are A2 screen coordinates (0-639, 0-399);
+`button_states` bit 0 is the left button and `buttons_valid` masks which
+button bits to apply.
+
 ## Troubleshooting
 
 - **`ConnectionRefusedError`** — KEGS isn't running or wasn't started

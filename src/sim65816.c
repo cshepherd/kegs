@@ -19,6 +19,7 @@ const char rcsid_sim65816_c[] = "@(#)$KmKId: sim65816.c,v 1.484 2024-01-15 02:56
 #undef INCLUDE_RCSID_C
 
 #include "debug_sock.h"
+#include "testfix.h"
 
 double g_dtime_sleep = 0;
 double g_dtime_in_sleep = 0;
@@ -667,6 +668,20 @@ parse_argv(int argc, char **argv, int slashes_to_find)
 			debug_sock_init(tmp1);
 			set_halt(1);	/* Boot halted; LLM connects then 'g' */
 			i++;
+		} else if(!strcmp("-record", argv[i])) {
+			if((i+1) >= argc) {
+				printf("Missing argument to -record\n");
+				return 1;
+			}
+			testfix_record_start(argv[i+1]);
+			i++;
+		} else if(!strcmp("-playback", argv[i])) {
+			if((i+1) >= argc) {
+				printf("Missing argument to -playback\n");
+				return 1;
+			}
+			testfix_playback_start(argv[i+1]);
+			i++;
 		} else if(!strncmp("-cfg", argv[i], 4)) {
 			if((i + 1) < argc) {
 				config_set_config_kegs_name(argv[i+1]);
@@ -1091,6 +1106,7 @@ run_16ms()
 	fflush(stdout);
 	g_dtime_sleep = 1.0/61.0;		// For control_panel/debugger
 	debug_sock_poll();
+	testfix_poll();
 	if(g_config_control_panel) {
 		ret = cfg_control_panel_update();
 		if(!g_config_control_panel) {
