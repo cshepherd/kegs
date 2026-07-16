@@ -1887,6 +1887,7 @@ adb_update_c025_mask(Kimage *kimage_ptr, word32 new_c025_val, word32 mask)
 	//  capslock state (so if capslock is on, we leave the window, release
 	//  capslock, then reenter the window, we update things properly).
 	if(kimage_ptr == &g_mainwin_kimage) {
+		testfix_c025_hook(new_c025_val, mask);
 		g_c025_val = (g_c025_val & (~mask)) | new_c025_val;
 	} else {
 		kimage_ptr->c025_val = (kimage_ptr->c025_val & (~mask)) |

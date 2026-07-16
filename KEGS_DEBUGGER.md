@@ -224,6 +224,7 @@ Plain text, one event per line, `#` comments allowed, editable by hand:
 KEGSFIX1
 K <cycle> <raw_a2code hex> <unicode hex> <is_up>     # key transition
 M <cycle> <x> <y> <button_states> <buttons_valid>    # mouse move/buttons
+C <cycle> <c025_val hex> <mask hex>                  # modifier-key state
 W <cycle>                                            # wait until cycle
 ```
 
@@ -234,6 +235,13 @@ Apple ADB keycode plus the unicode character the host driver supplied
 it). Mouse `x`/`y` are A2 screen coordinates (0-639, 0-399);
 `button_states` bit 0 is the left button and `buttons_valid` masks which
 button bits to apply.
+
+`C` events carry modifier-key state as $C025 bits: 1=Shift, 2=Ctrl,
+4=CapsLock, 0x40=Option (Closed Apple), 0x80=Cmd (**Open Apple**); the
+mask selects which bits to change. The Mac driver delivers modifiers this
+way (via `flagsChanged`) rather than as key up/down events, so e.g.
+holding Open Apple during a click records as
+`C <t1> 80 c7` ... mouse events ... `C <t2> 00 c7`.
 
 ## Troubleshooting
 
